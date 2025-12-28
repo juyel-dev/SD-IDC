@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SD-IDC MVP | Self-Describing Image Data Code</title>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔳 SD-IDC MVP</h1>
+            <p class="subtitle">Self-Describing Image Data Code | Image → Code → Image</p>
+        </header>
+        
+        <div class="workflow">
+            <!-- ENCODER SECTION -->
+            <div class="section encoder-section">
+                <h2>1. Encode Image</h2>
+                <div class="upload-area" id="dropArea">
+                    <p>Drag & drop an image or click to browse</p>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                
+                <div class="controls">
+                    <label>Bit Depth:</label>
+                    <select id="bitDepth">
+                        <option value="1">1-bit (Black/White)</option>
+                        <option value="2">2-bit (4 Grays)</option>
+                        <option value="4" selected>4-bit (16 Grays)</option>
+                    </select>
+                    
+                    <label>Target Size:</label>
+                    <select id="targetSize">
+                        <option value="128">128px</option>
+                        <option value="256" selected>256px</option>
+                        <option value="512">512px</option>
+                    </select>
+                    
+                    <button id="encodeBtn">Generate SD-IDC Code</button>
+                </div>
+                
+                <div class="result">
+                    <h3>Original Image</h3>
+                    <canvas id="originalCanvas"></canvas>
+                    
+                    <h3>SD-IDC Code Generated</h3>
+                    <canvas id="codeCanvas"></canvas>
+                    <button id="downloadBtn">Download Code</button>
+                </div>
+            </div>
+            
+            <!-- DECODER SECTION -->
+            <div class="section decoder-section">
+                <h2>2. Decode SD-IDC</h2>
+                <div class="upload-area" id="dropAreaCode">
+                    <p>Drag & drop an SD-IDC code or click to browse</p>
+                    <input type="file" id="codeInput" accept="image/*">
+                </div>
+                
+                <div class="result">
+                    <h3>SD-IDC Code Loaded</h3>
+                    <canvas id="loadedCodeCanvas"></canvas>
+                    
+                    <h3>Reconstructed Image</h3>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="decodeProgress"></div>
+                        <span id="progressText">0%</span>
+                    </div>
+                    <canvas id="reconstructedCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h3>How It Works</h3>
+            <ol>
+                <li><strong>Encode:</strong> Your image is resized, quantized, and converted to a binary stream.</li>
+                <li><strong>Self-Describe:</strong> A header with image metadata is embedded in the code itself.</li>
+                <li><strong>Render:</strong> The binary stream becomes a visible pixel grid (SD-IDC code).</li>
+                <li><strong>Decode:</strong> Any SD-IDC decoder reads the header to reconstruct the original image.</li>
+            </ol>
+            <p class="warning">⚠️ For best results: Use PNG format, avoid JPEG compression on the code image.</p>
+        </div>
+    </div>
+    
+    <script src="encoder.js"></script>
+    <script src="decoder.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
