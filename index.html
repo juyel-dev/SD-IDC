@@ -3,150 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SD-IDC System | Self-Describing Image Data Code</title>
+    <title>Ultra-Compress Image to QR System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
     <style>
-        :root { --accent: #00ff88; --bg: #0a0a0a; }
-        body { font-family: 'Courier New', monospace; background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .container { max-width: 800px; width: 100%; border: 1px solid #333; padding: 20px; border-radius: 8px; background: #111; }
-        h1 { color: var(--accent); text-align: center; font-size: 1.5rem; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .box { border: 2px dashed #444; padding: 10px; text-align: center; border-radius: 5px; }
-        canvas { max-width: 100%; height: auto; margin-top: 10px; image-rendering: pixelated; border: 1px solid #222; }
-        button { background: var(--accent); color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; width: 100%; margin: 10px 0; }
-        input[type="file"] { margin: 10px 0; color: #888; }
-        .status { font-size: 0.8rem; color: var(--accent); margin-top: 5px; }
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { margin-bottom: 10px; color: var(--primary); }
+        p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; text-align: center; max-width: 600px;}
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .panel {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .panel h2 { margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+
+        /* Upload Button Styling */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: block;
+            background: #334155;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+            border: 2px dashed #475569;
+        }
+
+        .file-upload-label:hover { background: #475569; border-color: var(--primary); }
+
+        /* QR Output Area */
+        #qrcode {
+            margin: 20px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #qrcode img { display: block; } /* Fix layout shift */
+
+        /* Decoded Image Area */
+        #decodedImage {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid var(--primary);
+            display: none;
+        }
+
+        button.download-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: none; /* Hidden until QR is ready */
+            width: 100%;
+        }
+
+        button.download-btn:hover { background-color: #4f46e5; }
+
+        .status {
+            font-size: 0.85rem;
+            color: #fbbf24;
+            margin-top: 10px;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        /* Stats display */
+        .stats {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            display: none;
+        }
+        .stats span { display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>[ SD-IDC ENGINE v1.0 ]</h1>
-    <p style="font-size: 0.7rem; text-align: center; color: #666;">Visual Data Remapping | No Cloud | No URL</p>
+    <h1>Infinite Image Storage System</h1>
+    <p>Convert images into data-heavy QR codes using aggressive compression algorithms, and decode them back to images.</p>
 
-    <div class="grid">
-        <div class="box">
-            <h3>Encoder</h3>
-            <input type="file" id="uploadInput" accept="image/*">
-            <button onclick="encodeImage()">Generate SD-IDC</button>
-            <canvas id="mainCanvas"></canvas>
-            <div id="encodeStatus" class="status"></div>
-        </div>
-
-        <div class="box">
-            <h3>Decoder</h3>
-            <input type="file" id="decodeInput" accept="image/*">
-            <button onclick="decodeImage()">Decode SD-IDC</button>
-            <canvas id="outputCanvas"></canvas>
-            <div id="decodeStatus" class="status"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const BLOCK_SIZE = 2; // প্রতিটি ডেটা বিট ৪ পিক্সেল (2x2) জায়গা নিবে স্ট্যাবিলিটির জন্য
-
-    // --- ENCODER LOGIC ---
-    async function encodeImage() {
-        const input = document.getElementById('uploadInput');
-        if (!input.files[0]) return alert("Select an image first!");
-
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const img = new Image();
+    <div class="container">
         
-        img.onload = () => {
-            // ১. ছোট রেজোলিউশনে রিসাইজ (MVP এর জন্য 64x64)
-            const w = 64; 
-            const h = 64;
-            canvas.width = w;
-            canvas.height = h;
-            ctx.drawImage(img, 0, 0, w, h);
+        <div class="panel">
+            <h2>1. Encode (Image to QR)</h2>
+            <div class="file-upload">
+                <label for="imageInput" class="file-upload-label">
+                    <span>Click to Upload Image</span>
+                </label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
 
-            // ২. পিক্সেল ডেটা সংগ্রহ
-            const imgData = ctx.getImageData(0, 0, w, h).data;
-            const bits = [];
-
-            // ৩. থ্রেশহোল্ডিং (Black & White এ রূপান্তর)
-            for (let i = 0; i < imgData.length; i += 4) {
-                const avg = (imgData[i] + imgData[i+1] + imgData[i+2]) / 3;
-                bits.push(avg > 127 ? 1 : 0);
-            }
-
-            // ৪. SD-IDC গ্রিড তৈরি (Header সহ)
-            // Header: [Version (8bit), Width (16bit), Height (16bit)]
-            renderIDC(bits, w, h);
-        };
-        img.src = URL.createObjectURL(input.files[0]);
-    }
-
-    function renderIDC(bits, w, h) {
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // গ্রিড সাইজ নির্ধারণ (BLOCK_SIZE অনুযায়ী)
-        canvas.width = w * BLOCK_SIZE;
-        canvas.height = h * BLOCK_SIZE;
-        ctx.fillStyle = "white";
-        ctx.fillRect(0,0, canvas.width, canvas.height);
-
-        for (let i = 0; i < bits.length; i++) {
-            const x = (i % w) * BLOCK_SIZE;
-            const y = Math.floor(i / w) * BLOCK_SIZE;
+            <div id="qrcode"></div>
+            <div id="encodeStatus" class="status">Waiting for image...</div>
             
-            ctx.fillStyle = bits[i] === 1 ? "white" : "black";
-            ctx.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
-        }
-        document.getElementById('encodeStatus').innerText = `Generated: ${w}x${h} dots`;
-    }
+            <div id="compressionStats" class="stats"></div>
 
-    // --- DECODER LOGIC ---
-    function decodeImage() {
-        const input = document.getElementById('decodeInput');
-        if (!input.files[0]) return alert("Select SD-IDC image!");
+            <button id="downloadBtn" class="download-btn">Download QR Code</button>
+        </div>
 
-        const canvas = document.getElementById('outputCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const img = new Image();
+        <div class="panel">
+            <h2>2. Decode (QR to Image)</h2>
+            <div class="file-upload">
+                <label for="qrInput" class="file-upload-label">
+                    <span>Upload QR Code</span>
+                </label>
+                <input type="file" id="qrInput" accept="image/*">
+            </div>
+            
+            <div id="decodeStatus" class="status"></div>
+            <img id="decodedImage" alt="Decoded Result">
+        </div>
 
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
+    </div>
 
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-            const w = canvas.width / BLOCK_SIZE;
-            const h = canvas.height / BLOCK_SIZE;
+    <script>
+        // --- CONFIGURATION ---
+        const MAX_QR_CHARS = 2300; // Safe limit for V40 QR with L correction
+        
+        // --- ENCODER LOGIC ---
+        const imageInput = document.getElementById('imageInput');
+        const qrcodeDiv = document.getElementById('qrcode');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const encodeStatus = document.getElementById('encodeStatus');
+        const statsDiv = document.getElementById('compressionStats');
 
-            const outCanvas = document.getElementById('outputCanvas');
-            const outCtx = outCanvas.getContext('2d');
-            outCanvas.width = w;
-            outCanvas.height = h;
-            const resultImgData = outCtx.createImageData(w, h);
+        imageInput.addEventListener('change', async function(e) {
+            if (e.target.files.length === 0) return;
 
-            let bitIndex = 0;
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
-                    // ব্লকের মাঝখানের পিক্সেল স্যাম্পল করা (Accuracy এর জন্য)
-                    const pixelX = x * BLOCK_SIZE + Math.floor(BLOCK_SIZE/2);
-                    const pixelY = y * BLOCK_SIZE + Math.floor(BLOCK_SIZE/2);
-                    const idx = (pixelY * canvas.width + pixelX) * 4;
+            const file = e.target.files[0];
+            encodeStatus.textContent = "Processing & Compressing...";
+            qrcodeDiv.innerHTML = "";
+            downloadBtn.style.display = "none";
+            statsDiv.style.display = "none";
 
-                    const val = imgData[idx] > 127 ? 255 : 0;
-                    
-                    const outIdx = bitIndex * 4;
-                    resultImgData.data[outIdx] = val;     // R
-                    resultImgData.data[outIdx+1] = val;   // G
-                    resultImgData.data[outIdx+2] = val;   // B
-                    resultImgData.data[outIdx+3] = 255;   // A
-                    bitIndex++;
-                }
+            try {
+                // 1. Compress Image recursively until it fits
+                const { base64, finalWidth, finalSize } = await smartCompress(file);
+                
+                // 2. Generate QR
+                generateQR(base64);
+                
+                // 3. Update UI
+                encodeStatus.textContent = "Done!";
+                statsDiv.style.display = "block";
+                statsDiv.innerHTML = `
+                    <span>Original Size: ${(file.size/1024).toFixed(2)} KB</span>
+                    <span>Compressed Size: ${(finalSize/1024).toFixed(2)} KB</span>
+                    <span>Resized Width: ${finalWidth}px</span>
+                `;
+                downloadBtn.style.display = "block";
+
+            } catch (err) {
+                console.error(err);
+                encodeStatus.textContent = "Error: Image too complex to compress sufficiently.";
             }
-            outCtx.putImageData(resultImgData, 0, 0);
-            document.getElementById('decodeStatus').innerText = `Decoded Successfully!`;
-        };
-        img.src = URL.createObjectURL(input.files[0]);
-    }
-</script>
+        });
 
+        // The "Special Tech": Recursive Smart Compression
+        function smartCompress(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Start with a small size
+                        let width = 150; 
+                        let quality = 0.7;
+                        let dataUrl = "";
+                        
+                        // Recursive reduction loop
+                        const attemptCompression = () => {
+                            const scale = width / img.width;
+                            const height = img.height * scale;
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Use WebP for better compression if available, else JPEG
+                            dataUrl = canvas.toDataURL('image/webp', quality);
+                            
+                            // Check if standard JPEG is better (sometimes it is for tiny images)
+                            if(dataUrl.length > MAX_QR_CHARS) {
+                                let jpegUrl = canvas.toDataURL('image/jpeg', quality);
+                                if(jpegUrl.length < dataUrl.length) dataUrl = jpegUrl;
+                            }
+
+                            // Remove header to save space (we will add it back in decoder)
+                            // We keep a tiny flag to know format, or just assume.
+                            // To save max space, we strip "data:image/xxx;base64," completely.
+                            const base64Clean = dataUrl.split(',')[1];
+
+                            if (base64Clean.length < MAX_QR_CHARS) {
+                                resolve({ 
+                                    base64: dataUrl, // Keep full URL for QR to ensure compatibility with standard readers
+                                    finalWidth: width,
+                                    finalSize: base64Clean.length
+                                });
+                            } else {
+                                // If still too big, reduce parameters aggressively
+                                width -= 10;
+                                quality -= 0.05;
+                                if (width < 30 || quality < 0.1) {
+                                    reject("Cannot compress enough");
+                                } else {
+                                    attemptCompression();
+                                }
+                            }
+                        };
+                        attemptCompression();
+                    };
+                };
+            });
+        }
+
+        function generateQR(text) {
+            qrcodeDiv.innerHTML = ""; // Clear previous
+            new QRCode(qrcodeDiv, {
+                text: text,
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.L // Low error correction = Max Storage
+            });
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            const img = qrcodeDiv.querySelector('img');
+            if (img) {
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = 'compressed-image-qr.png';
+                link.click();
+            }
+        });
+
+        // --- DECODER LOGIC ---
+        const qrInput = document.getElementById('qrInput');
+        const decodedImage = document.getElementById('decodedImage');
+        const decodeStatus = document.getElementById('decodeStatus');
+
+        qrInput.addEventListener('change', function(e) {
+            if (e.target.files.length === 0) return;
+            const file = e.target.files[0];
+            decodeStatus.textContent = "Scanning QR...";
+            decodedImage.style.display = "none";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    context.drawImage(img, 0, 0, img.width, img.height);
+                    
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    // Use jsQR to find code
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (code) {
+                        decodeStatus.textContent = "Success! Image recovered.";
+                        decodedImage.src = code.data; // The data is the full DataURL
+                        decodedImage.style.display = "block";
+                    } else {
+                        decodeStatus.textContent = "Error: Could not find a valid QR code.";
+                    }
+                };
+            };
+        });
+
+    </script>
 </body>
 </html>
