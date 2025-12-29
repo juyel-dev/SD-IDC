@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMQC Encoder - Create Advanced Optical Codes</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>HMQC Encoder</h1>
+            <p>Create high-capacity multi-color optical codes</p>
+        </header>
+
+        <nav class="nav">
+            <a href="index.html" class="nav-btn">← Back to Home</a>
+            <a href="decoder.html" class="nav-btn">🔍 Decoder</a>
+        </nav>
+
+        <div class="card">
+            <h2>1. Drop Your File</h2>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon">📂</div>
+                <div class="drop-text">Drop file here to encode</div>
+                <div class="drop-hint">Supports: Text, Images, Audio, Binary files (Max 10MB)</div>
+            </div>
+            <input type="file" id="fileInput" class="file-input">
+            <div id="fileInfo" class="status" style="display: none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>2. Encoding Options</h2>
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="matrixSize">Matrix Size</label>
+                    <input type="range" id="matrixSize" min="256" max="4096" value="1024" step="64">
+                    <small>Current: <span id="matrixSizeValue">1024</span>×<span id="matrixSizeValue">1024</span></small>
+                </div>
+                <div class="option-group">
+                    <label for="colorDepth">Color Depth</label>
+                    <select id="colorDepth">
+                        <option value="24">24-bit RGB</option>
+                        <option value="32" selected>32-bit RGBA (Recommended)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="compression">Compression Level</label>
+                    <select id="compression">
+                        <option value="1">Fast (Low)</option>
+                        <option value="5">Balanced</option>
+                        <option value="9" selected>Maximum</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="encryption">Encryption</label>
+                    <select id="encryption">
+                        <option value="none" selected>None</option>
+                        <option value="aes">AES-256 (Password)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. Generate Code</h2>
+            <button id="encodeBtn" class="btn" style="width: 100%;">
+                Generate HMQC Code
+            </button>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+            </div>
+            
+            <div id="status" class="status"></div>
+        </div>
+
+        <div class="preview-area">
+            <h3>Generated HMQC Code</h3>
+            <canvas id="codeCanvas"></canvas>
+            <!-- Download button will be added here dynamically -->
+        </div>
+
+        <div class="card">
+            <h2>Encoding Statistics</h2>
+            <div class="stats" style="display: none;">
+                <div class="stat-box">
+                    <div class="stat-value" id="statOriginal">0 B</div>
+                    <div class="stat-label">Original Size</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statCompressed">0 B</div>
+                    <div class="stat-label">Compressed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statRatio">0%</div>
+                    <div class="stat-label">Compression</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statECC">0 B</div>
+                    <div class="stat-label">ECC Overhead</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statMatrix">0×0</div>
+                    <div class="stat-label">Matrix Size</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statModules">0</div>
+                    <div class="stat-label">Total Modules</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load core libraries -->
+    <script src="js/hmqc-core.js"></script>
+    <script src="js/compression.js"></script>
+    <script src="js/ecc.js"></script>
+    <script src="js/encoder.js"></script>
+</body>
+</html>
