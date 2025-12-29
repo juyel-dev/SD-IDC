@@ -1,350 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra-Compress Image to QR System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
-    <style>
-        :root {
-            --primary: #6366f1;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 { margin-bottom: 10px; color: var(--primary); }
-        p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; text-align: center; max-width: 600px;}
-
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        .panel {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #334155;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .panel h2 { margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
-
-        /* Upload Button Styling */
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .file-upload input[type="file"] {
-            display: none;
-        }
-
-        .file-upload-label {
-            display: block;
-            background: #334155;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.3s;
-            border: 2px dashed #475569;
-        }
-
-        .file-upload-label:hover { background: #475569; border-color: var(--primary); }
-
-        /* QR Output Area */
-        #qrcode {
-            margin: 20px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #qrcode img { display: block; } /* Fix layout shift */
-
-        /* Decoded Image Area */
-        #decodedImage {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 2px solid var(--primary);
-            display: none;
-        }
-
-        button.download-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: none; /* Hidden until QR is ready */
-            width: 100%;
-        }
-
-        button.download-btn:hover { background-color: #4f46e5; }
-
-        .status {
-            font-size: 0.85rem;
-            color: #fbbf24;
-            margin-top: 10px;
-            min-height: 20px;
-            text-align: center;
-        }
-
-        /* Stats display */
-        .stats {
-            background: #0f172a;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            width: 100%;
-            box-sizing: border-box;
-            display: none;
-        }
-        .stats span { display: block; margin-bottom: 4px; }
-    </style>
+    <title>HyperMatrix Quantum Code - Advanced 2D Optical System</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-    <h1>Infinite Image Storage System</h1>
-    <p>Convert images into data-heavy QR codes using aggressive compression algorithms, and decode them back to images.</p>
-
     <div class="container">
-        
-        <div class="panel">
-            <h2>1. Encode (Image to QR)</h2>
-            <div class="file-upload">
-                <label for="imageInput" class="file-upload-label">
-                    <span>Click to Upload Image</span>
-                </label>
-                <input type="file" id="imageInput" accept="image/*">
-            </div>
+        <header class="header">
+            <h1>HyperMatrix Quantum Code</h1>
+            <p>Advanced Custom 2D Optical Code System | 10MB+ Capacity | Multi-Color | Drag & Drop</p>
+        </header>
 
-            <div id="qrcode"></div>
-            <div id="encodeStatus" class="status">Waiting for image...</div>
-            
-            <div id="compressionStats" class="stats"></div>
+        <nav class="nav">
+            <a href="encoder.html" class="nav-btn">📝 Create HMQC Code</a>
+            <a href="decoder.html" class="nav-btn">🔍 Scan HMQC Code</a>
+        </nav>
 
-            <button id="downloadBtn" class="download-btn">Download QR Code</button>
+        <div class="card">
+            <h2>System Overview</h2>
+            <p style="color: #888; line-height: 1.8;">
+                HMQC is a revolutionary 2D optical code system designed for the digital age. 
+                Unlike traditional QR codes, HMQC supports <strong>10MB+ data capacity</strong>, 
+                <strong>multi-color encoding</strong>, <strong>advanced compression</strong>, and 
+                <strong>robust error correction</strong>. Perfect for sharing files, text, images, 
+                and audio without camera scanning - just drag and drop!
+            </p>
         </div>
 
-        <div class="panel">
-            <h2>2. Decode (QR to Image)</h2>
-            <div class="file-upload">
-                <label for="qrInput" class="file-upload-label">
-                    <span>Upload QR Code</span>
-                </label>
-                <input type="file" id="qrInput" accept="image/*">
+        <div class="card">
+            <h2>Technical Specifications</h2>
+            <div class="stats" style="display: grid;">
+                <div class="stat-box">
+                    <div class="stat-value">32MB</div>
+                    <div class="stat-label">Max Raw Capacity</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">100MB</div>
+                    <div class="stat-label">Compressed Max</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">40%</div>
+                    <div class="stat-label">Error Tolerance</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">4096×4096</div>
+                    <div class="stat-label">Max Matrix Size</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">16.7M</div>
+                    <div class="stat-label">Color Combinations</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">∞</div>
+                    <div class="stat-label">Dynamic Scaling</div>
+                </div>
             </div>
-            
-            <div id="decodeStatus" class="status"></div>
-            <img id="decodedImage" alt="Decoded Result">
         </div>
 
+        <div class="card">
+            <h2>Supported Data Types</h2>
+            <ul style="color: #888; line-height: 2; list-style: none; padding: 0;">
+                <li>✓ Text (TXT, JSON, XML, HTML, MD, CSV)</li>
+                <li>✓ Images (PNG, JPG, GIF, WebP, BMP)</li>
+                <li>✓ Audio (MP3, WAV, FLAC, OGG)</li>
+                <li>✓ Binary Files (Any format)</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            <p>HyperMatrix Quantum Code v3.0 | Open Source | GitHub Pages Ready</p>
+            <p style="color: #666; margin-top: 10px;">
+                No server required. All processing happens in your browser.
+            </p>
+        </footer>
     </div>
-
-    <script>
-        // --- CONFIGURATION ---
-        const MAX_QR_CHARS = 2300; // Safe limit for V40 QR with L correction
-        
-        // --- ENCODER LOGIC ---
-        const imageInput = document.getElementById('imageInput');
-        const qrcodeDiv = document.getElementById('qrcode');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const encodeStatus = document.getElementById('encodeStatus');
-        const statsDiv = document.getElementById('compressionStats');
-
-        imageInput.addEventListener('change', async function(e) {
-            if (e.target.files.length === 0) return;
-
-            const file = e.target.files[0];
-            encodeStatus.textContent = "Processing & Compressing...";
-            qrcodeDiv.innerHTML = "";
-            downloadBtn.style.display = "none";
-            statsDiv.style.display = "none";
-
-            try {
-                // 1. Compress Image recursively until it fits
-                const { base64, finalWidth, finalSize } = await smartCompress(file);
-                
-                // 2. Generate QR
-                generateQR(base64);
-                
-                // 3. Update UI
-                encodeStatus.textContent = "Done!";
-                statsDiv.style.display = "block";
-                statsDiv.innerHTML = `
-                    <span>Original Size: ${(file.size/1024).toFixed(2)} KB</span>
-                    <span>Compressed Size: ${(finalSize/1024).toFixed(2)} KB</span>
-                    <span>Resized Width: ${finalWidth}px</span>
-                `;
-                downloadBtn.style.display = "block";
-
-            } catch (err) {
-                console.error(err);
-                encodeStatus.textContent = "Error: Image too complex to compress sufficiently.";
-            }
-        });
-
-        // The "Special Tech": Recursive Smart Compression
-        function smartCompress(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        // Start with a small size
-                        let width = 150; 
-                        let quality = 0.7;
-                        let dataUrl = "";
-                        
-                        // Recursive reduction loop
-                        const attemptCompression = () => {
-                            const scale = width / img.width;
-                            const height = img.height * scale;
-                            
-                            canvas.width = width;
-                            canvas.height = height;
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            // Use WebP for better compression if available, else JPEG
-                            dataUrl = canvas.toDataURL('image/webp', quality);
-                            
-                            // Check if standard JPEG is better (sometimes it is for tiny images)
-                            if(dataUrl.length > MAX_QR_CHARS) {
-                                let jpegUrl = canvas.toDataURL('image/jpeg', quality);
-                                if(jpegUrl.length < dataUrl.length) dataUrl = jpegUrl;
-                            }
-
-                            // Remove header to save space (we will add it back in decoder)
-                            // We keep a tiny flag to know format, or just assume.
-                            // To save max space, we strip "data:image/xxx;base64," completely.
-                            const base64Clean = dataUrl.split(',')[1];
-
-                            if (base64Clean.length < MAX_QR_CHARS) {
-                                resolve({ 
-                                    base64: dataUrl, // Keep full URL for QR to ensure compatibility with standard readers
-                                    finalWidth: width,
-                                    finalSize: base64Clean.length
-                                });
-                            } else {
-                                // If still too big, reduce parameters aggressively
-                                width -= 10;
-                                quality -= 0.05;
-                                if (width < 30 || quality < 0.1) {
-                                    reject("Cannot compress enough");
-                                } else {
-                                    attemptCompression();
-                                }
-                            }
-                        };
-                        attemptCompression();
-                    };
-                };
-            });
-        }
-
-        function generateQR(text) {
-            qrcodeDiv.innerHTML = ""; // Clear previous
-            new QRCode(qrcodeDiv, {
-                text: text,
-                width: 256,
-                height: 256,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.L // Low error correction = Max Storage
-            });
-        }
-
-        downloadBtn.addEventListener('click', () => {
-            const img = qrcodeDiv.querySelector('img');
-            if (img) {
-                const link = document.createElement('a');
-                link.href = img.src;
-                link.download = 'compressed-image-qr.png';
-                link.click();
-            }
-        });
-
-        // --- DECODER LOGIC ---
-        const qrInput = document.getElementById('qrInput');
-        const decodedImage = document.getElementById('decodedImage');
-        const decodeStatus = document.getElementById('decodeStatus');
-
-        qrInput.addEventListener('change', function(e) {
-            if (e.target.files.length === 0) return;
-            const file = e.target.files[0];
-            decodeStatus.textContent = "Scanning QR...";
-            decodedImage.style.display = "none";
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    context.drawImage(img, 0, 0, img.width, img.height);
-                    
-                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                    
-                    // Use jsQR to find code
-                    const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-                    if (code) {
-                        decodeStatus.textContent = "Success! Image recovered.";
-                        decodedImage.src = code.data; // The data is the full DataURL
-                        decodedImage.style.display = "block";
-                    } else {
-                        decodeStatus.textContent = "Error: Could not find a valid QR code.";
-                    }
-                };
-            };
-        });
-
-    </script>
 </body>
 </html>
