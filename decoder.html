@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMQC Decoder - Scan & Recover Data</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>HMQC Scanner & Decoder</h1>
+            <p>Drag & drop scan to recover encoded data</p>
+        </header>
+
+        <nav class="nav">
+            <a href="index.html" class="nav-btn">← Back to Home</a>
+            <a href="encoder.html" class="nav-btn">📝 Encoder</a>
+        </nav>
+
+        <div class="card">
+            <h2>1. Drop HMQC Image</h2>
+            <div class="drop-zone" id="dropScanZone">
+                <div class="drop-icon">📷</div>
+                <div class="drop-text">Drop HMQC code image here</div>
+                <div class="drop-hint">Supports: PNG, JPG, WebP (High quality recommended)</div>
+            </div>
+            <input type="file" id="scanFileInput" class="file-input" accept="image/*">
+            <div id="scanFileInfo" class="status" style="display: none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>2. Scan Options</h2>
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="scanQuality">Scan Quality</label>
+                    <select id="scanQuality">
+                        <option value="fast" selected>Fast Scan</option>
+                        <option value="accurate">Accurate (Slower)</option>
+                        <option value="extreme">Extreme Accuracy (Very Slow)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="errorCorrection">Force ECC Level</label>
+                    <select id="errorCorrection">
+                        <option value="auto" selected>Auto Detect</option>
+                        <option value="max">Maximum Correction</option>
+                        <option value="fast">Fast Correction</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. Decode & Recover</h2>
+            <button id="decodeBtn" class="btn" style="width: 100%;">
+                🔍 Scan & Decode HMQC
+            </button>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+            </div>
+            
+            <div id="status" class="status"></div>
+        </div>
+
+        <div class="scan-preview-area" style="display: none;">
+            <h3>Scanned Image Preview</h3>
+            <div id="scanPreview"></div>
+        </div>
+
+        <div class="decoded-content-area" style="display: none;">
+            <h3>Decoded Content</h3>
+            <div id="decodedContent"></div>
+            <button id="downloadDecodedBtn" class="btn" style="margin-top: 20px;">
+                💾 Download Decoded File
+            </button>
+        </div>
+
+        <div class="card">
+            <h2>Decoding Statistics</h2>
+            <div class="decoding-stats" style="display: none;">
+                <div class="stat-box">
+                    <div class="stat-value" id="statDecodedType">Unknown</div>
+                    <div class="stat-label">Data Type</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statOriginalSize">0 B</div>
+                    <div class="stat-label">Original Size</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statCompressedSize">0 B</div>
+                    <div class="stat-label">Compressed Size</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statErrorsCorrected">0</div>
+                    <div class="stat-label">Errors Corrected</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statScannedSize">0 B</div>
+                    <div class="stat-label">Scanned Data</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statTimestamp">-</div>
+                    <div class="stat-label">Encoded Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load core libraries -->
+    <script src="js/hmqc-core.js"></script>
+    <script src="js/compression.js"></script>
+    <script src="js/ecc.js"></script>
+    <script src="js/decoder.js"></script>
+</body>
+</html>
