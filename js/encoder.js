@@ -10,70 +10,119 @@ class HMQCEncoder {
         this.ecc = new HMQCECC();
         this.isProcessing = false;
         
-        this.initEventListeners();
+        // ডিবাগ: চেক করুন DOM এলিমেন্ট আসে কিনা
+        console.log('Initializing HMQC Encoder...');
+        
+        // অপেক্ষা করুন DOM পুরোপুরি লোড হতে
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initEventListeners());
+        } else {
+            this.initEventListeners();
+        }
     }
 
     initEventListeners() {
+        console.log('Setting up event listeners...');
+        
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const encodeBtn = document.getElementById('encodeBtn');
         const matrixSizeInput = document.getElementById('matrixSize');
 
-        // Drag & Drop
+        if (!dropZone || !fileInput) {
+            console.error('CRITICAL: Drop zone or file input not found!');
+            alert('Error: Page elements not loaded. Please refresh.');
+            return;
+        }
+
+        console.log('Elements found:', { dropZone, fileInput, encodeBtn });
+
+        // Drag & Drop ইভেন্ট
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('dragover');
+            console.log('Drag over detected');
         });
 
         dropZone.addEventListener('dragleave', () => {
             dropZone.classList.remove('dragover');
+            console.log('Drag leave detected');
         });
 
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
+            console.log('Drop event:', e.dataTransfer.files);
             this.handleFiles(e.dataTransfer.files);
         });
 
-        dropZone.addEventListener('click', () => {
+        // ক্লিক ইভেন্ট - সরাসরি file input ট্রিগার করুন
+        dropZone.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Drop zone clicked, triggering file input...');
             fileInput.click();
         });
 
+        // ফাইল ইনপুট চেঞ্জ ইভেন্ট
         fileInput.addEventListener('change', (e) => {
+            console.log('File input changed:', e.target.files);
             this.handleFiles(e.target.files);
         });
 
-        // Encode button
-        encodeBtn.addEventListener('click', () => {
-            this.startEncoding();
-        });
+        // এনকোড বাটন
+        if (encodeBtn) {
+            encodeBtn.addEventListener('click', () => {
+                console.log('Encode button clicked');
+                this.startEncoding();
+            });
+        }
 
-        // Matrix size slider
-        matrixSizeInput.addEventListener('input', (e) => {
-            document.getElementById('matrixSizeValue').textContent = e.target.value;
-        });
+        // ম্যাট্রিক্স সাইজ স্লাইডার
+        if (matrixSizeInput) {
+            matrixSizeInput.addEventListener('input', (e) => {
+                document.getElementById('matrixSizeValue').textContent = e.target.value;
+            });
+        }
+
+        console.log('All event listeners attached successfully!');
     }
 
     handleFiles(files) {
-        if (files.length === 0) return;
+        if (!files || files.length === 0) {
+            console.warn('No files provided to handleFiles');
+            return;
+        }
+        
+        console.log('Handling files:', files);
         
         this.selectedFile = files[0];
         const dropZone = document.getElementById('dropZone');
         const fileInfo = document.getElementById('fileInfo');
         
-        // Update UI
+        // ইউআই আপডেট
         dropZone.querySelector('.drop-icon').textContent = '📄';
         dropZone.querySelector('.drop-text').textContent = this.selectedFile.name;
         dropZone.querySelector('.drop-hint').textContent = 
             `Size: ${this.formatBytes(this.selectedFile.size)} | Type: ${this.selectedFile.type || 'Unknown'}`;
         
-        // Show file info
-        fileInfo.style.display = 'block';
-        fileInfo.className = 'status success';
-        fileInfo.textContent = `✓ File loaded: ${this.selectedFile.name}`;
+        // ফাইল ইনফো দেখান
+        if (fileInfo) {
+            fileInfo.style.display = 'block';
+            fileInfo.className = 'status success';
+            fileInfo.textContent = `✓ File loaded: ${this.selectedFile.name}`;
+        }
         
-        // Detect data type
+        // ডাটা টাইপ ডিটেক্ট করুন
         this.detectDataType(this.selectedFile);
+        
+        console.log('File processed successfully:', this.selectedFile);
     }
 
     detectDataType(file) {
@@ -91,21 +140,27 @@ class HMQCEncoder {
             this.dataType = 'binary';
         }
         
-        console.log(`Detected data type: ${this.dataType}`);
+        console.log(`Detected data type: ${this.dataType} (extension: ${extension}, mime: ${mime})`);
     }
 
     async startEncoding() {
-        if (!this.selectedFile || this.isProcessing) {
+        if (!this.selectedFile) {
             this.showStatus('Please select a file first!', 'warning');
+            return;
+        }
+
+        if (this.isProcessing) {
+            this.showStatus('Already processing...', 'warning');
             return;
         }
 
         this.isProcessing = true;
         const encodeBtn = document.getElementById('encodeBtn');
         encodeBtn.disabled = true;
-        encodeBtn.textContent = 'Encoding...';
+        encodeBtn.textContent = 'Processing...';
 
         try {
+            console.log('Starting encoding process...');
             await this.encodeFile();
         } catch (error) {
             console.error('Encoding error:', error);
@@ -120,15 +175,18 @@ class HMQCEncoder {
     async encodeFile() {
         this.showProgress(0);
         
-        // Step 1: Read file
+        // Step 1: ফাইল রিড করুন
+        console.log('Step 1: Reading file...');
         const fileData = await this.readFile(this.selectedFile);
         this.showProgress(10);
         
-        // Step 2: Compress
+        // Step 2: কম্প্রেস করুন
+        console.log('Step 2: Compressing data...');
         const compressed = this.compressor.compress(fileData, this.dataType);
+        console.log(`Compressed ${fileData.length} → ${compressed.length} bytes`);
         this.showProgress(40);
         
-        // Step 3: Add metadata
+        // Step 3: মেটাডাটা যোগ করুন
         const metadata = this.core.generateMetadata(
             this.dataType,
             fileData.length,
@@ -136,25 +194,28 @@ class HMQCEncoder {
         );
         const dataWithMeta = this.concatenateArrays(metadata, compressed);
         
-        // Step 4: Apply ECC
+        // Step 4: ECC এপ্লাই করুন
+        console.log('Step 3: Applying ECC...');
         const encoded = this.ecc.encode(dataWithMeta);
         this.showProgress(70);
         
-        // Step 5: Generate matrix
+        // Step 5: ম্যাট্রিক্স তৈরি করুন
+        console.log('Step 4: Generating matrix...');
         const matrixSize = parseInt(document.getElementById('matrixSize').value);
         const modules = this.core.bytesToColorModules(encoded, matrixSize, matrixSize);
         
-        // Step 6: Render to canvas
+        // Step 6: ক্যানভাসে রেন্ডার করুন
         const canvas = document.getElementById('codeCanvas');
         this.core.renderToCanvas(canvas, modules, matrixSize);
         
         this.showProgress(100);
         
-        // Step 7: Show preview and stats
+        // Step 7: প্রিভিউ এবং স্ট্যাটস দেখান
         this.showPreview();
         this.updateStats(fileData.length, compressed.length, encoded.length, matrixSize);
         
         this.showStatus('✓ Encoding successful! Download your HMQC code.', 'success');
+        console.log('Encoding completed successfully!');
     }
 
     readFile(file) {
@@ -162,6 +223,7 @@ class HMQCEncoder {
             const reader = new FileReader();
             
             reader.onload = (e) => {
+                console.log('File read complete');
                 const result = e.target.result;
                 if (typeof result === 'string') {
                     const encoder = new TextEncoder();
@@ -171,7 +233,10 @@ class HMQCEncoder {
                 }
             };
             
-            reader.onerror = () => reject(reader.error);
+            reader.onerror = () => {
+                console.error('File read error:', reader.error);
+                reject(reader.error);
+            };
             
             if (this.dataType === 'text') {
                 reader.readAsText(file);
@@ -185,15 +250,16 @@ class HMQCEncoder {
         const container = document.querySelector('.progress-container');
         const fill = document.getElementById('progressFill');
         
-        container.style.display = 'block';
-        fill.style.width = `${percent}%`;
-        fill.textContent = `${percent}%`;
+        if (container) container.style.display = 'block';
+        if (fill) {
+            fill.style.width = `${percent}%`;
+            fill.textContent = `${percent}%`;
+        }
     }
 
     showPreview() {
         document.querySelector('.preview-area').style.display = 'block';
         
-        // Add download button
         const canvas = document.getElementById('codeCanvas');
         const downloadBtn = document.createElement('a');
         downloadBtn.href = canvas.toDataURL('image/png');
@@ -231,6 +297,8 @@ class HMQCEncoder {
 
     showStatus(message, type) {
         const status = document.getElementById('status');
+        if (!status) return;
+        
         status.textContent = message;
         status.className = `status ${type}`;
         status.style.display = 'block';
@@ -262,8 +330,9 @@ class HMQCEncoder {
     }
 }
 
-// Initialize on page load
+// পেজ লোড হলে অটো ইনিশিয়ালাইজ
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing encoder...');
     window.encoder = new HMQCEncoder();
 });
-              
+            
