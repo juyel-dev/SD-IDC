@@ -1,80 +1,75 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HyperMatrix Quantum Code - Advanced 2D Optical System</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>AI Printable Creator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --p: #2563eb; --bg: #f8fafc; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 100%; max-width: 400px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--p); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #output { width: 100%; margin-top: 20px; border-radius: 10px; display: none; border: 2px solid #eee; }
+        .loader { display: none; margin: 10px; color: var(--p); font-weight: bold; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>HyperMatrix Quantum Code</h1>
-            <p>Advanced Custom 2D Optical Code System | 10MB+ Capacity | Multi-Color | Drag & Drop</p>
-        </header>
 
-        <nav class="nav">
-            <a href="encoder.html" class="nav-btn">📝 Create HMQC Code</a>
-            <a href="decoder.html" class="nav-btn">🔍 Scan HMQC Code</a>
-        </nav>
-
-        <div class="card">
-            <h2>System Overview</h2>
-            <p style="color: #888; line-height: 1.8;">
-                HMQC is a revolutionary 2D optical code system designed for the digital age. 
-                Unlike traditional QR codes, HMQC supports <strong>10MB+ data capacity</strong>, 
-                <strong>multi-color encoding</strong>, <strong>advanced compression</strong>, and 
-                <strong>robust error correction</strong>. Perfect for sharing files, text, images, 
-                and audio without camera scanning - just drag and drop!
-            </p>
-        </div>
-
-        <div class="card">
-            <h2>Technical Specifications</h2>
-            <div class="stats" style="display: grid;">
-                <div class="stat-box">
-                    <div class="stat-value">32MB</div>
-                    <div class="stat-label">Max Raw Capacity</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">100MB</div>
-                    <div class="stat-label">Compressed Max</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">40%</div>
-                    <div class="stat-label">Error Tolerance</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">4096×4096</div>
-                    <div class="stat-label">Max Matrix Size</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">16.7M</div>
-                    <div class="stat-label">Color Combinations</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">∞</div>
-                    <div class="stat-label">Dynamic Scaling</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Supported Data Types</h2>
-            <ul style="color: #888; line-height: 2; list-style: none; padding: 0;">
-                <li>✓ Text (TXT, JSON, XML, HTML, MD, CSV)</li>
-                <li>✓ Images (PNG, JPG, GIF, WebP, BMP)</li>
-                <li>✓ Audio (MP3, WAV, FLAC, OGG)</li>
-                <li>✓ Binary Files (Any format)</li>
-            </ul>
-        </div>
-
-        <footer class="footer">
-            <p>HyperMatrix Quantum Code v3.0 | Open Source | GitHub Pages Ready</p>
-            <p style="color: #666; margin-top: 10px;">
-                No server required. All processing happens in your browser.
-            </p>
-        </footer>
+    <div class="card">
+        <h2>🎨 AI Print Generator</h2>
+        <p style="font-size: 0.9rem; color: #666;">যা প্রিন্ট করতে চান তা লিখুন (যেমন: 'Mandala art for coloring')</p>
+        <input type="text" id="prompt" placeholder="Enter your idea here...">
+        <button onclick="generateImage()">Generate AI Art</button>
+        <div id="loader" class="loader">AI ভাবছে... (১০-১৫ সেকেন্ড সময় লাগতে পারে)</div>
+        <img id="output" alt="Generated AI Art">
+        <button id="printBtn" style="display:none; background: #059669;" onclick="downloadPDF()">Download as Printable PDF</button>
     </div>
+
+    <script>
+        // আপনি Hugging Face থেকে একটি ফ্রি API Key নিয়ে এখানে বসাতে পারেন। 
+        // নিচেরটি একটি ডেমো এন্ডপয়েন্ট।
+        const API_URL = "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5";
+        
+        async function generateImage() {
+            const prompt = document.querySelector("#prompt").value;
+            if(!prompt) return alert("কিছু তো লিখুন!");
+
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('output').style.display = 'none';
+            document.getElementById('printBtn').style.display = 'none';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ inputs: prompt + ", high resolution, black and white outline for coloring, sharp lines" }),
+                });
+
+                const blob = await response.blob();
+                const imgUrl = URL.createObjectURL(blob);
+                
+                const imgDisplay = document.getElementById('output');
+                imgDisplay.src = imgUrl;
+                imgDisplay.style.display = 'block';
+                document.getElementById('printBtn').style.display = 'block';
+            } catch (e) {
+                alert("Error: " + e.message);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const img = document.getElementById('output');
+            
+            doc.text("My AI Generated Printable", 10, 10);
+            doc.addImage(img, 'JPEG', 10, 20, 190, 190);
+            doc.save("ai-print.pdf");
+        }
+    </script>
 </body>
 </html>
